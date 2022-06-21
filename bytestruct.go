@@ -9,21 +9,7 @@ import (
 	"strconv"
 )
 
-type Validator interface {
-	Verification(reader io.Reader)
-}
-
-type Handler struct {
-	Order         binary.ByteOrder
-	ThrowLeftOver bool
-	PreValidator  Validator
-}
-
-func (handler Handler) Unmarshal(reader io.Reader, v interface{}) error {
-
-	if handler.PreValidator != nil {
-		handler.PreValidator.Verification(reader)
-	}
+func Unmarshal(reader io.Reader, order binary.ByteOrder, v interface{}) error {
 
 	val := reflect.ValueOf(v)
 	ty := reflect.TypeOf(v)
@@ -41,105 +27,105 @@ func (handler Handler) Unmarshal(reader io.Reader, v interface{}) error {
 		switch t.Type.Kind() {
 		case reflect.Bool:
 			var value bool
-			if err := binary.Read(reader, handler.Order, &value); err == nil {
+			if err := binary.Read(reader, order, &value); err == nil {
 				f.SetBool(value)
 			} else {
 				return err
 			}
 		case reflect.Int:
 			var value int
-			if err := binary.Read(reader, handler.Order, &value); err == nil {
+			if err := binary.Read(reader, order, &value); err == nil {
 				f.SetUint(uint64(value))
 			} else {
 				return err
 			}
 		case reflect.Int8:
 			var value int8
-			if err := binary.Read(reader, handler.Order, &value); err == nil {
+			if err := binary.Read(reader, order, &value); err == nil {
 				f.SetUint(uint64(value))
 			} else {
 				return err
 			}
 		case reflect.Int16:
 			var value int16
-			if err := binary.Read(reader, handler.Order, &value); err == nil {
+			if err := binary.Read(reader, order, &value); err == nil {
 				f.SetUint(uint64(value))
 			} else {
 				return err
 			}
 		case reflect.Int32:
 			var value int32
-			if err := binary.Read(reader, handler.Order, &value); err == nil {
+			if err := binary.Read(reader, order, &value); err == nil {
 				f.SetUint(uint64(value))
 			} else {
 				return err
 			}
 		case reflect.Int64:
 			var value int64
-			if err := binary.Read(reader, handler.Order, &value); err == nil {
+			if err := binary.Read(reader, order, &value); err == nil {
 				f.SetUint(uint64(value))
 			} else {
 				return err
 			}
 		case reflect.Uint:
 			var value uint
-			if err := binary.Read(reader, handler.Order, &value); err == nil {
+			if err := binary.Read(reader, order, &value); err == nil {
 				f.SetUint(uint64(value))
 			} else {
 				return err
 			}
 		case reflect.Uint8:
 			var value uint8
-			if err := binary.Read(reader, handler.Order, &value); err == nil {
+			if err := binary.Read(reader, order, &value); err == nil {
 				f.SetUint(uint64(value))
 			} else {
 				return err
 			}
 		case reflect.Uint16:
 			var value uint16
-			if err := binary.Read(reader, handler.Order, &value); err == nil {
+			if err := binary.Read(reader, order, &value); err == nil {
 				f.SetUint(uint64(value))
 			} else {
 				return err
 			}
 		case reflect.Uint32:
 			var value uint32
-			if err := binary.Read(reader, handler.Order, &value); err == nil {
+			if err := binary.Read(reader, order, &value); err == nil {
 				f.SetUint(uint64(value))
 			} else {
 				return err
 			}
 		case reflect.Uint64:
 			var value uint64
-			if err := binary.Read(reader, handler.Order, &value); err == nil {
+			if err := binary.Read(reader, order, &value); err == nil {
 				f.SetUint(uint64(value))
 			} else {
 				return err
 			}
 		case reflect.Float32:
 			var value float32
-			if err := binary.Read(reader, handler.Order, &value); err == nil {
+			if err := binary.Read(reader, order, &value); err == nil {
 				f.SetFloat(float64(value))
 			} else {
 				return err
 			}
 		case reflect.Float64:
 			var value float64
-			if err := binary.Read(reader, handler.Order, &value); err == nil {
+			if err := binary.Read(reader, order, &value); err == nil {
 				f.SetFloat(float64(value))
 			} else {
 				return err
 			}
 		case reflect.String:
-			if err := handler.unmarshalString(reader, m, &t, &f); err != nil {
+			if err := unmarshalString(reader, order, m, &t, &f); err != nil {
 				return err
 			}
 		case reflect.Slice:
-			if err := handler.unmarshalArray(reader, m, &t, &f); err != nil {
+			if err := unmarshalArray(reader, order, m, &t, &f); err != nil {
 				return err
 			}
 		case reflect.Struct:
-			if err := handler.unmarshalStruct(reader, m, &t, &f); err != nil {
+			if err := unmarshalStruct(reader, order, m, &t, &f); err != nil {
 				return err
 			}
 		default:
@@ -151,12 +137,12 @@ func (handler Handler) Unmarshal(reader io.Reader, v interface{}) error {
 	return nil
 }
 
-func (handler Handler) unmarshalStruct(reader io.Reader, m map[string]reflect.Value, field *reflect.StructField, value *reflect.Value) error {
+func unmarshalStruct(reader io.Reader, order binary.ByteOrder, m map[string]reflect.Value, field *reflect.StructField, value *reflect.Value) error {
 
 	return fmt.Errorf("do not support recreating struct: %s ", field.Type.Elem().Kind())
 }
 
-func (handler Handler) unmarshalArray(reader io.Reader, m map[string]reflect.Value, field *reflect.StructField, value *reflect.Value) error {
+func unmarshalArray(reader io.Reader, order binary.ByteOrder, m map[string]reflect.Value, field *reflect.StructField, value *reflect.Value) error {
 
 	if v, ok := field.Tag.Lookup("byte"); ok {
 
@@ -174,7 +160,7 @@ func (handler Handler) unmarshalArray(reader io.Reader, m map[string]reflect.Val
 		switch field.Type.Elem().Kind() {
 
 		case reflect.Uint8:
-			if err := binary.Read(reader, handler.Order, &data); err == nil {
+			if err := binary.Read(reader, order, &data); err == nil {
 				value.SetBytes(data)
 			}
 
@@ -188,7 +174,7 @@ func (handler Handler) unmarshalArray(reader io.Reader, m map[string]reflect.Val
 	return nil
 }
 
-func (handler Handler) unmarshalString(reader io.Reader, m map[string]reflect.Value, field *reflect.StructField, value *reflect.Value) error {
+func unmarshalString(reader io.Reader, order binary.ByteOrder, m map[string]reflect.Value, field *reflect.StructField, value *reflect.Value) error {
 	if v, ok := field.Tag.Lookup("byte"); ok {
 
 		size, err := strconv.Atoi(v)
@@ -201,7 +187,7 @@ func (handler Handler) unmarshalString(reader io.Reader, m map[string]reflect.Va
 		}
 
 		data := make([]byte, size)
-		if err := binary.Read(reader, handler.Order, &data); err == nil {
+		if err := binary.Read(reader, order, &data); err == nil {
 			value.SetString(string(data))
 		}
 	} else {
@@ -211,7 +197,7 @@ func (handler Handler) unmarshalString(reader io.Reader, m map[string]reflect.Va
 	return nil
 }
 
-func (handler Handler) Marshal(v interface{}) ([]byte, error) {
+func Marshal(order binary.ByteOrder, v interface{}) ([]byte, error) {
 
 	val := reflect.ValueOf(v)
 	ty := reflect.TypeOf(v)
@@ -228,63 +214,63 @@ func (handler Handler) Marshal(v interface{}) ([]byte, error) {
 		m[t.Name] = f
 		switch t.Type.Kind() {
 		case reflect.Bool:
-			if err := binary.Write(&buf, handler.Order, f.Bool()); err != nil {
+			if err := binary.Write(&buf, order, f.Bool()); err != nil {
 				return nil, err
 			}
 		case reflect.Int:
-			if err := binary.Write(&buf, handler.Order, f.Int()); err != nil {
+			if err := binary.Write(&buf, order, f.Int()); err != nil {
 				return nil, err
 			}
 		case reflect.Int8:
-			if err := binary.Write(&buf, handler.Order, int8(f.Int())); err != nil {
+			if err := binary.Write(&buf, order, int8(f.Int())); err != nil {
 				return nil, err
 			}
 		case reflect.Int16:
-			if err := binary.Write(&buf, handler.Order, int16(f.Int())); err != nil {
+			if err := binary.Write(&buf, order, int16(f.Int())); err != nil {
 				return nil, err
 			}
 		case reflect.Int32:
-			if err := binary.Write(&buf, handler.Order, int32(f.Int())); err != nil {
+			if err := binary.Write(&buf, order, int32(f.Int())); err != nil {
 				return nil, err
 			}
 		case reflect.Int64:
-			if err := binary.Write(&buf, handler.Order, int64(f.Int())); err != nil {
+			if err := binary.Write(&buf, order, int64(f.Int())); err != nil {
 				return nil, err
 			}
 		case reflect.Uint:
-			if err := binary.Write(&buf, handler.Order, f.Uint()); err != nil {
+			if err := binary.Write(&buf, order, f.Uint()); err != nil {
 				return nil, err
 			}
 		case reflect.Uint8:
-			if err := binary.Write(&buf, handler.Order, uint(f.Uint())); err != nil {
+			if err := binary.Write(&buf, order, uint(f.Uint())); err != nil {
 				return nil, err
 			}
 		case reflect.Uint16:
-			if err := binary.Write(&buf, handler.Order, uint16(f.Uint())); err != nil {
+			if err := binary.Write(&buf, order, uint16(f.Uint())); err != nil {
 				return nil, err
 			}
 		case reflect.Uint32:
-			if err := binary.Write(&buf, handler.Order, uint32(f.Uint())); err != nil {
+			if err := binary.Write(&buf, order, uint32(f.Uint())); err != nil {
 				return nil, err
 			}
 		case reflect.Uint64:
-			if err := binary.Write(&buf, handler.Order, uint64(f.Uint())); err != nil {
+			if err := binary.Write(&buf, order, uint64(f.Uint())); err != nil {
 				return nil, err
 			}
 		case reflect.Float32:
-			if err := binary.Write(&buf, handler.Order, float32(f.Float())); err != nil {
+			if err := binary.Write(&buf, order, float32(f.Float())); err != nil {
 				return nil, err
 			}
 		case reflect.Float64:
-			if err := binary.Write(&buf, handler.Order, float64(f.Float())); err != nil {
+			if err := binary.Write(&buf, order, float64(f.Float())); err != nil {
 				return nil, err
 			}
 		case reflect.String:
-			if err := binary.Write(&buf, handler.Order, []byte(f.String())); err != nil {
+			if err := binary.Write(&buf, order, []byte(f.String())); err != nil {
 				return nil, err
 			}
 		case reflect.Slice:
-			if err := binary.Write(&buf, handler.Order, f.Bytes()); err != nil {
+			if err := binary.Write(&buf, order, f.Bytes()); err != nil {
 				return nil, err
 			}
 			/*case reflect.Struct:
