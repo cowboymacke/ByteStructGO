@@ -17,9 +17,11 @@ func Unmarshal(reader io.Reader, order binary.ByteOrder, v interface{}) error {
 	val = val.Elem()
 
 	m := make(map[string]reflect.Value)
+	fmt.Println("what is")
+	fmt.Println(val)
 
 	for i := 0; i < val.NumField(); i++ {
-
+		fmt.Println("loop")
 		f := val.Field(i)
 		t := ty.Field(i)
 
@@ -35,21 +37,21 @@ func Unmarshal(reader io.Reader, order binary.ByteOrder, v interface{}) error {
 		case reflect.Int:
 			var value int
 			if err := binary.Read(reader, order, &value); err == nil {
-				f.SetUint(uint64(value))
+				f.SetInt(int64(value))
 			} else {
 				return err
 			}
 		case reflect.Int8:
 			var value int8
 			if err := binary.Read(reader, order, &value); err == nil {
-				f.SetUint(uint64(value))
+				f.SetInt(int64(value))
 			} else {
 				return err
 			}
 		case reflect.Int16:
 			var value int16
 			if err := binary.Read(reader, order, &value); err == nil {
-				f.SetUint(uint64(value))
+				f.SetInt(int64(value))
 			} else {
 				return err
 			}
@@ -63,7 +65,7 @@ func Unmarshal(reader io.Reader, order binary.ByteOrder, v interface{}) error {
 		case reflect.Int64:
 			var value int64
 			if err := binary.Read(reader, order, &value); err == nil {
-				f.SetUint(uint64(value))
+				f.SetInt(int64(value))
 			} else {
 				return err
 			}
@@ -125,7 +127,7 @@ func Unmarshal(reader io.Reader, order binary.ByteOrder, v interface{}) error {
 				return err
 			}
 		case reflect.Struct:
-			if err := unmarshalStruct(reader, order, m, &t, &f); err != nil {
+			if err := unmarshalStruct(reader, order, m, &t, f.Interface()); err != nil {
 				return err
 			}
 		default:
@@ -137,9 +139,12 @@ func Unmarshal(reader io.Reader, order binary.ByteOrder, v interface{}) error {
 	return nil
 }
 
-func unmarshalStruct(reader io.Reader, order binary.ByteOrder, m map[string]reflect.Value, field *reflect.StructField, value *reflect.Value) error {
+func unmarshalStruct(reader io.Reader, order binary.ByteOrder, m map[string]reflect.Value, field *reflect.StructField, value interface{}) error {
 
-	return fmt.Errorf("do not support recreating struct: %s ", field.Type.Elem().Kind())
+	fmt.Println("struct")
+	val := reflect.TypeOf(value)
+	fmt.Println(val.NumField())
+	return nil
 }
 
 func unmarshalArray(reader io.Reader, order binary.ByteOrder, m map[string]reflect.Value, field *reflect.StructField, value *reflect.Value) error {
@@ -209,6 +214,7 @@ func Marshal(order binary.ByteOrder, v interface{}) ([]byte, error) {
 	for i := 0; i < val.NumField(); i++ {
 
 		f := val.Field(i)
+
 		t := ty.Field(i)
 
 		m[t.Name] = f
@@ -273,10 +279,15 @@ func Marshal(order binary.ByteOrder, v interface{}) ([]byte, error) {
 			if err := binary.Write(&buf, order, f.Bytes()); err != nil {
 				return nil, err
 			}
-			/*case reflect.Struct:
-			if err := handler.handleStruct(reader, m, &t, &f); err != nil {
-				return err
-			}*/
+		case reflect.Struct:
+			data, err := Marshal(order, f.Interface())
+			if err != nil {
+				return nil, err
+			}
+
+			if err := binary.Write(&buf, order, data); err != nil {
+				return nil, err
+			}
 		default:
 			return nil, fmt.Errorf("does not support type : %s ", t.Type.Kind())
 		}
