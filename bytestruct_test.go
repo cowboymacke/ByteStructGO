@@ -9,13 +9,13 @@ import (
 
 type StructTwo struct {
 	Value    int8
-	ValueTwo int8
-	name     string `byte:"ValueTwo"`
+	ValueTwo uint8  `byteLength:"Name"`
+	Name     string `byte:"ValueTwo"`
 }
 
 type StructOne struct {
-	Length  int16
-	Payload StructTwo `byte:"Length"`
+	Length  uint16
+	Payload StructTwo
 }
 
 func Test_Marshal(t *testing.T) {
@@ -24,7 +24,7 @@ func Test_Marshal(t *testing.T) {
 		Payload: StructTwo{
 			Value:    1,
 			ValueTwo: 2,
-			name:     "he",
+			Name:     "Hello world",
 		},
 	})
 
@@ -40,7 +40,7 @@ func Test_unmarshalt(t *testing.T) {
 
 	var data StructOne
 
-	reader := bytes.NewBuffer([]byte{0, 2, 1, 2, 104, 101})
+	reader := bytes.NewBuffer([]byte{0, 2, 1, 11, 72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100})
 	err := Unmarshal(reader, binary.BigEndian, &data)
 
 	if err != nil {
