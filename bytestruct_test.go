@@ -29,7 +29,7 @@ func Test_Marshal(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Errorf("faild with error %w", err)
+		t.Errorf("faild with error %e", err)
 	}
 
 	fmt.Printf("sucess with data : %d", data)
@@ -44,7 +44,7 @@ func Test_unmarshalt(t *testing.T) {
 	err := Unmarshal(reader, binary.BigEndian, &data)
 
 	if err != nil {
-		t.Errorf("faild with error %w", err)
+		t.Errorf("faild with error %e", err)
 	}
 
 	fmt.Println("sucess")

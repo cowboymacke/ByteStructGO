@@ -1,3 +1,3 @@
-module com.ling.bytestructs
+module github.com/MarcusLing/ByteStructGO
 
 go 1.17
