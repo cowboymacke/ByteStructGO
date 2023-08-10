@@ -216,7 +216,6 @@ func Marshal(order binary.ByteOrder, v interface{}) ([]byte, error) {
 
 		if v, ok := t.Tag.Lookup("byteLength"); ok {
 			length := uint8(len(val.FieldByName(v).String()))
-			fmt.Println(length)
 			if err := binary.Write(&buf, order, length); err != nil {
 				return nil, err
 			}
@@ -252,7 +251,7 @@ func Marshal(order binary.ByteOrder, v interface{}) ([]byte, error) {
 					return nil, err
 				}
 			case reflect.Uint8:
-				if err := binary.Write(&buf, order, uint(f.Uint())); err != nil {
+				if err := binary.Write(&buf, order, uint8(f.Uint())); err != nil {
 					return nil, err
 				}
 			case reflect.Uint16:
