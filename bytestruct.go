@@ -71,7 +71,7 @@ func readData(reader io.Reader, order binary.ByteOrder, structField reflect.Stru
 	case reflect.Int32:
 		var value int32
 		if err := binary.Read(reader, order, &value); err == nil {
-			val.SetUint(uint64(value))
+			val.SetInt(int64(value))
 		} else {
 			return err
 		}
