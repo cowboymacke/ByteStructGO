@@ -3,49 +3,127 @@ package bytestruct
 import (
 	"bytes"
 	"encoding/binary"
-	"fmt"
+	"reflect"
 	"testing"
 )
 
-type StructTwo struct {
-	Value    int8
-	ValueTwo uint8  `byteLength:"Name"`
-	Name     string `byte:"ValueTwo"`
+type Simple struct {
+	Length uint16 `byteLength:"Name"`
+	Name   string `byte:"Length"`
 }
 
-type StructOne struct {
-	Length  uint16
-	Payload StructTwo
-}
+func Test_simple(t *testing.T) {
 
-func Test_Marshal(t *testing.T) {
-	data, err := Marshal(binary.BigEndian, StructOne{
-		Length: 2,
-		Payload: StructTwo{
-			Value:    1,
-			ValueTwo: 2,
-			Name:     "Hello world",
-		},
+	name := "HelloWorld"
+
+	data, err := Marshal(binary.BigEndian, Simple{
+		Name: name,
 	})
 
 	if err != nil {
 		t.Errorf("faild with error %e", err)
 	}
 
-	fmt.Printf("sucess with data : %d", data)
+	var umData Simple
+	reader := bytes.NewBuffer(data)
+	err = Unmarshal(reader, binary.BigEndian, &umData)
+	if err != nil {
+		t.Errorf("faild with error %e", err)
+	}
 
+	nameLen, err := intCaster(len(name), reflect.TypeOf(umData.Length).Kind())
+	if err != nil {
+		t.Errorf("faild with error %e", err)
+	}
+
+	if umData.Length != nameLen {
+		t.Errorf("failed with DataLength")
+	}
+
+	if umData.Name != name {
+		t.Errorf("failed with name")
+	}
 }
 
-func Test_unmarshalt(t *testing.T) {
+type StructTwo struct {
+	Value      int8
+	TextLength uint8  `byteLength:"Name"`
+	Name       string `byte:"TextLength"`
+}
 
-	var data StructOne
+type StructOne struct {
+	Type    uint8
+	Length  uint16    `byteLength:"Payload"`
+	Payload StructTwo `byte:"Length"`
+}
 
-	reader := bytes.NewBuffer([]byte{0, 2, 1, 11, 72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100})
-	err := Unmarshal(reader, binary.BigEndian, &data)
+func Test_marshal(t *testing.T) {
+	testData := StructOne{
+		Type: 25,
+		Payload: StructTwo{
+			Value: 1,
+			Name:  "HelloBigWorld",
+		},
+	}
+	data, err := Marshal(binary.BigEndian, testData)
 
 	if err != nil {
 		t.Errorf("faild with error %e", err)
 	}
 
-	fmt.Println("sucess")
+	var umData StructOne
+	reader := bytes.NewBuffer(data)
+	err = Unmarshal(reader, binary.BigEndian, &umData)
+	if err != nil {
+		t.Errorf("faild with error %e", err)
+	}
+
+	if umData.Type != testData.Type {
+		t.Errorf("Marsheld failed with Type data ")
+	}
+
+	if umData.Payload.Value != testData.Payload.Value {
+		t.Errorf("Marsheld failed with Type Value ")
+	}
+
+	if umData.Payload.Name != testData.Payload.Name {
+		t.Errorf("Marsheld failed with Type Name ")
+	}
+
+}
+
+type ArrayData struct {
+	Type   uint8
+	Length uint8  `byteLength:"Name"`
+	Name   string `byte:"Length"`
+}
+
+type StructArray struct {
+	LengthUint    uint16      `byteLength:"PayloadUint"`
+	PayloadUint   []uint8     `byte:"LengthUint"`
+	LengthStruct  uint16      `byteLength:"PayloadStruct"`
+	PayloadStruct []ArrayData `byte:"LengthStruct"`
+}
+
+func Test_marshal_array(t *testing.T) {
+	testData := StructArray{
+		PayloadStruct: []ArrayData{{Type: 1, Name: "Hello"}, {Type: 2, Name: "world"}},
+		PayloadUint:   []uint8{8, 2, 3, 5, 1},
+	}
+
+	data, err := Marshal(binary.BigEndian, testData)
+
+	if err != nil {
+		t.Errorf("faild with error %e", err)
+		return
+	}
+
+	var umData StructArray
+	reader := bytes.NewBuffer(data)
+	err = Unmarshal(reader, binary.BigEndian, &umData)
+
+	if err != nil {
+		t.Errorf("faild with error %e", err)
+	}
+
 }
