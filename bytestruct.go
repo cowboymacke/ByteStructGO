@@ -37,7 +37,7 @@ func readData(reader io.Reader, order binary.ByteOrder, structField reflect.Stru
 		t := val.Type()
 		for i := 0; i < val.NumField(); i++ {
 			structF := t.Field(i)
-			if v := val.Field(i); v.CanSet() || structF.Name != "_" {
+			if v := val.Field(i); v.CanSet() {
 				if err := readData(reader, order, structF, v, storedValues); err != nil {
 					return err
 				}
@@ -148,6 +148,10 @@ func readData(reader io.Reader, order binary.ByteOrder, structField reflect.Stru
 	return nil
 }
 
+func test() {
+
+}
+
 func unmarshalArray(reader io.Reader, order binary.ByteOrder, storedValues map[string]reflect.Value, field reflect.StructField, value reflect.Value) error {
 
 	if v, ok := field.Tag.Lookup("byte"); ok {
@@ -170,11 +174,27 @@ func unmarshalArray(reader io.Reader, order binary.ByteOrder, storedValues map[s
 			if err := binary.Read(reader, order, &data); err != nil {
 				return err
 			}
-			//Mabye i should list array
-			fmt.Println(value.Len())
-			if err := readData(bytes.NewBuffer(data), order, reflect.StructField{}, value, storedValues); err != nil {
-				return err
+
+			slice := reflect.MakeSlice(value.Type(), 100, 100)
+
+			sliceReader := bytes.NewBuffer(data)
+			index := 0
+			for ; sliceReader.Len() != 0; index++ {
+				sliceStruct := reflect.New(value.Type().Elem()).Elem()
+				t := value.Type().Elem()
+				for i := 0; i < t.NumField(); i++ {
+					structF := t.Field(i)
+					if v := sliceStruct.Field(i); v.CanSet() {
+						if err := readData(sliceReader, order, structF, v, storedValues); err != nil {
+							return err
+						}
+					}
+
+				}
+				v := slice.Index(index)
+				v.Set(sliceStruct)
 			}
+			value.Set(slice.Slice(0, index))
 			break
 		default:
 			if err := binary.Read(reader, order, &data); err == nil {
