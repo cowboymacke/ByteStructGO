@@ -1,14 +1,13 @@
-#ByteStructGO
-
-##
+### ByteStructGO
+:construction: This is **not** production ready :construction:
 
 ByteStructGO is a Go library that simplifies the reading and writing of binary data. It allows you to define the structure of your data using tags, and then automatically handles the encoding and decoding of bytes. ByteStructGO supports both little-endian and big-endian byte orders.
 
-##Features
+## Features
 -  Easy to use: just define your data structure using tags, and let ByteStructGO do the rest.
 -  Nested Structure: ByteStructGO can decode nessted and array structs
 
-##Missing
+## Missing
 - cant handle array of strings
 
 
