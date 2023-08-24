@@ -72,4 +72,10 @@ You can find more examples of using ByteStructGO in the [examples] folder.
 If you have any questions, suggestions, or issues, please feel free to open an issue or submit a pull request.
 
 
-[examples]: https://github.com/MarcusLing/ByteStructGO/tree/main/examples)https://github.com/MarcusLing/ByteStructGO/tree/main/examples
+
+
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+
+
+[examples]:https://github.com/MarcusLing/ByteStructGO/tree/main/examples
