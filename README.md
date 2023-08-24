@@ -22,11 +22,6 @@ go get github.com/MarcusLing/ByteStructGO
 To use ByteStructGO, you need to import the package and define your data structure using tags.
 
 
-Offset |  Size	| Description
-0 | 2|  payloadSize (uint16) [0x0 0xb]
-2 | x |  payload (string) [0x48 0x65 0x6c 0x6c 0x6f 0x20 0x57 0x6f 0x72 0x6c 0x64]
-
-
 ```go
 package main
 
