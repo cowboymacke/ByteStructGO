@@ -154,7 +154,7 @@ func test() {
 
 func unmarshalArray(reader io.Reader, order binary.ByteOrder, storedValues map[string]reflect.Value, field reflect.StructField, value reflect.Value) error {
 
-	if v, ok := field.Tag.Lookup("byte"); ok {
+	if v, ok := field.Tag.Lookup("byteSize"); ok {
 
 		var size int
 
@@ -204,14 +204,14 @@ func unmarshalArray(reader io.Reader, order binary.ByteOrder, storedValues map[s
 
 		}
 	} else {
-		return fmt.Errorf("Field: %s is missing byte tag", field.Name)
+		return fmt.Errorf("Field: %s is missing byteSize tag", field.Name)
 	}
 
 	return nil
 }
 
 func unmarshalString(reader io.Reader, order binary.ByteOrder, storedValues map[string]reflect.Value, field reflect.StructField, value reflect.Value) error {
-	if v, ok := field.Tag.Lookup("byte"); ok {
+	if v, ok := field.Tag.Lookup("byteSize"); ok {
 		var size int
 
 		if mapValue, ok := storedValues[v]; ok {
@@ -244,7 +244,7 @@ func Marshal(order binary.ByteOrder, v interface{}) ([]byte, error) {
 		f := val.Field(i)
 		t := ty.Field(i)
 
-		if v, ok := t.Tag.Lookup("byteLength"); ok {
+		if v, ok := t.Tag.Lookup("bytePayload"); ok {
 			field := val.FieldByName(v)
 
 			handled[v] = 0

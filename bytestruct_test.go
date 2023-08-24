@@ -3,23 +3,25 @@ package bytestruct
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"reflect"
 	"testing"
 )
 
 type Simple struct {
-	Length uint16 `byteLength:"Name"`
-	Name   string `byte:"Length"`
+	Length uint16 `bytePayload:"Name"`
+	Name   string `byteSize:"Length"`
 }
 
 func Test_simple(t *testing.T) {
 
-	name := "HelloWorld"
+	name := "Hello World"
 
 	data, err := Marshal(binary.BigEndian, Simple{
 		Name: name,
 	})
 
+	fmt.Println(data)
 	if err != nil {
 		t.Errorf("faild with error %e", err)
 	}
@@ -47,14 +49,14 @@ func Test_simple(t *testing.T) {
 
 type StructTwo struct {
 	Value      int8
-	TextLength uint8  `byteLength:"Name"`
-	Name       string `byte:"TextLength"`
+	TextLength uint8  `bytePayload:"Name"`
+	Name       string `byteSize:"TextLength"`
 }
 
 type StructOne struct {
 	Type    uint8
-	Length  uint16    `byteLength:"Payload"`
-	Payload StructTwo `byte:"Length"`
+	Length  uint16    `bytePayload:"Payload"`
+	Payload StructTwo `byteSize:"Length"`
 }
 
 func Test_marshal(t *testing.T) {
@@ -94,15 +96,15 @@ func Test_marshal(t *testing.T) {
 
 type ArrayData struct {
 	Type   uint8
-	Length uint8  `byteLength:"Name"`
-	Name   string `byte:"Length"`
+	Length uint8  `bytePayload:"Name"`
+	Name   string `byteSize:"Length"`
 }
 
 type StructArray struct {
-	LengthUint    uint16      `byteLength:"PayloadUint"`
-	PayloadUint   []uint8     `byte:"LengthUint"`
-	LengthStruct  uint16      `byteLength:"PayloadStruct"`
-	PayloadStruct []ArrayData `byte:"LengthStruct"`
+	LengthUint    uint16      `bytePayload:"PayloadUint"`
+	PayloadUint   []uint8     `byteSize:"LengthUint"`
+	LengthStruct  uint16      `bytePayload:"PayloadStruct"`
+	PayloadStruct []ArrayData `byteSize:"LengthStruct"`
 }
 
 func Test_marshal_array(t *testing.T) {
