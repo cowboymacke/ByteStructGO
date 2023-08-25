@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	structGo "github.com/MarcusLing/ByteStructGO"
+	structGo "github.com/cowboymacke/ByteStructGO"
 )
 
 type Message struct {
