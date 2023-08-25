@@ -14,7 +14,7 @@ ByteStructGO is a Go library that simplifies the reading and writing of binary d
 ## Install
 
 ```sh
-go get github.com/MarcusLing/ByteStructGO
+go get github.com/cowboymacke/ByteStructGO
 ```
 
 ## Usage
