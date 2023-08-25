@@ -30,7 +30,7 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	structGo "github.com/MarcusLing/ByteStructGO"
+	structGo "github.com/cowboymacke/ByteStructGO"
 )
 
 // Define the message structure
