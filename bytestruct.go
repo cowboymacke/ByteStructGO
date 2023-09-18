@@ -175,7 +175,7 @@ func unmarshalArray(reader io.Reader, order binary.ByteOrder, storedValues map[s
 				return err
 			}
 
-			slice := reflect.MakeSlice(value.Type(), 100, 100)
+			slice := reflect.MakeSlice(value.Type(), size, size)
 
 			sliceReader := bytes.NewBuffer(data)
 			index := 0
